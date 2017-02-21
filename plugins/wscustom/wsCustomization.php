@@ -14,6 +14,9 @@ class wsCustomization
     private $path;
     private $username;
 
+    public $allowedLabels;
+
+
     function __construct()
     {
         $this->setPath();

@@ -14,6 +14,9 @@ class wsCustomization
     private $path;
     private $username;
 
+    public $allowedLabels;
+
+
     function __construct()
     {
         $this->setPath();
@@ -42,8 +45,11 @@ class wsCustomization
      */
     public static function isAdmin()
     {
-        global $ADMINS;
-        return in_array($_SERVER['PHP_AUTH_USER'], $ADMINS);
+        return in_array($_SERVER['PHP_AUTH_USER'], array(
+            'wicked',
+            'mrb',
+        )
+      );
     }
 
     /**
@@ -52,8 +58,23 @@ class wsCustomization
      */
     public static function  getAllowedLabels()
     {
-        global $ALLOWED_LABELS;
-        return $ALLOWED_LABELS;
+        return array(
+            'Anime',
+            'French',
+            'Learning',
+            'Mac',
+            'Misc',
+            'Movies',
+            'Music',
+            'NintendoDS',
+            'Porn',
+            'PS3',
+            'PSP',
+            'TVShows',
+            'Wii',
+            'Windows',
+            'XBox360'
+        );
     }
 
     /**
@@ -62,8 +83,17 @@ class wsCustomization
      */
     public static function  getDisabledColumns()
     {
-        global $DISABLED_COLUMNS_FOR_USERS;
-        return $DISABLED_COLUMNS_FOR_USERS;
+        return array(
+            'ratioday',
+            'ratioweek',
+            'ratiomonth',
+            'priority',
+            'owner',
+            'keep',
+            'ratiogroup',
+            'throttle',
+            'channel'
+        );
     }
 
     /**
@@ -72,8 +102,10 @@ class wsCustomization
      */
     public static function getHiddenLabels()
     {
-        global $HIDDEN_LABELS;
-        return $HIDDEN_LABELS;
+        return array(
+            'TVshows_Auto',
+            'Movies_Auto'
+        );
     }
 
     /**

@@ -88,29 +88,10 @@ if (isset($_REQUEST['result'])) {
             if ($torrent->errors()) {
                 unlink($file['file']);
                 $file['status'] = "FailedFile";
-                $owner = null;
-
-                if (isset($_REQUEST['owner']))
-                    $owner = trim($_REQUEST['owner']);
-
-                $req = new rXMLRPCRequest();
-
-                // Add owner for the torrent that matches the hashes
-                $cmd = new rXMLRPCCommand('d.set_custom', array(
-                    $torrent->hash_info(),
-                    'owner',
-                    $owner
-                ));
-
-                $req->addCommand($cmd);
-                $req->run();
-
-                $req->run();
-
             } else {
+
                 if (isset($_REQUEST['randomize_hash']))
                     $torrent->info['unique'] = uniqid("rutorrent-", true);
-
 
                 $hash = rTorrent::sendTorrent($torrent,
                     !isset($_REQUEST['torrents_start_stopped']),
@@ -122,24 +103,20 @@ if (isset($_REQUEST['result'])) {
                     $file['status'] = "Failed";
                 }
 
-                $owner = null;
-
-                if (isset($_REQUEST['owner']))
-                    $owner = trim($_REQUEST['owner']);
-
-                $req = new rXMLRPCRequest();
-
-                // Add owner for the torrent that matches the hashes
-                $cmd = new rXMLRPCCommand('d.set_custom', array(
-                    $hash,
-                    'owner',
-                    $owner
-                ));
-
-                $req->addCommand($cmd);
-                $req->run();
-
-
+                if ($torrent->info['unique'] == $hash) {
+                    $PHP_AUTH_USER = null;
+                    if (isset($_SERVER['PHP_AUTH_USER']))
+                        $PHP_AUTH_USER = trim($_SERVER['PHP_AUTH_USER']);
+                    $req = new rXMLRPCRequest();
+                    // Add owner for the torrent that matches the hashes
+                    $cmd = new rXMLRPCCommand('d.set_custom', array(
+                        $hash,
+                        'owner',
+                        $PHP_AUTH_USER
+                    ));
+                    $req->addCommand($cmd);
+                    $req->run();
+                }
             }
         }
         $location .= ('result[]=' . $file['status'] . '&');

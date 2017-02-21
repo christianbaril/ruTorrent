@@ -126,6 +126,7 @@ else
 					unlink($file['file']);
 					$file['status'] = "Failed";
 				}else{
+					
 						$owner = null;
 						if(isset($_REQUEST['owner']))
 							$owner = trim($_REQUEST['owner']);
@@ -135,7 +136,11 @@ else
 						$cmd->addParameter($hash,'string');
 						$cmd->addParameter('owner','string');
 						$cmd->addParameter($owner,'string');
-						$cmd->run();
+
+						$req = new rXMLRPCRequest($cmd);
+
+						$req->run();
+
 				}
 			}
 		}

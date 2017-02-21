@@ -115,10 +115,13 @@ else
 			{
 				if(isset($_REQUEST['randomize_hash']))
 					$torrent->info['unique'] = uniqid("rutorrent-",true);
-				if(rTorrent::sendTorrent($torrent,
+
+				$hash = rTorrent::sendTorrent($torrent,
 					!isset($_REQUEST['torrents_start_stopped']),
 					!isset($_REQUEST['not_add_path']),
-					$dir_edit,$label,$saveUploadedTorrents,isset($_REQUEST['fast_resume']))===false)
+					$dir_edit,$label,$saveUploadedTorrents,isset($_REQUEST['fast_resume']));
+
+				if($hash===false)
 				{
 					unlink($file['file']);
 					$file['status'] = "Failed";

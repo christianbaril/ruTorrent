@@ -126,19 +126,21 @@ else
 					unlink($file['file']);
 					$file['status'] = "Failed";
 				}else{
-					
+
 						$owner = null;
 						if(isset($_REQUEST['owner']))
 							$owner = trim($_REQUEST['owner']);
 
-						$cmd = new rXMLRPCCommand('d.set_custom');
+						$req = new rXMLRPCRequest();
+
 						// Add owner for the torrent that matches the hashes
-						$cmd->addParameter($hash,'string');
-						$cmd->addParameter('owner','string');
-						$cmd->addParameter($owner,'string');
+						$cmd = new rXMLRPCCommand('d.set_custom',array(
+							$hash,
+							'owner',
+							'mrb'
+						));
 
-						$req = new rXMLRPCRequest($cmd);
-
+						$req->addCommand($cmd);
 						$req->run();
 
 				}

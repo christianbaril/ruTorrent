@@ -3,6 +3,7 @@
 if (isset($_SERVER['HTTP_AUTHORIZATION']))
 {
     $ha = base64_decode( substr($_SERVER['HTTP_AUTHORIZATION'],6) );
+    var_dump($ha);
     list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':', $ha);
     unset $ha;
 }

@@ -168,43 +168,43 @@ class wsCustomization
     {
         global $jEnd, $jResult;
 
-        //$wsc = new wsCustomization();
+        $wsc = new wsCustomization();
 
         /**
          * Common stuff
          */
         // labels
-        $jResult .= "allowedLabels = " . json_encode($this->getAllowedLabels()) . ";";
+        $jResult .= "allowedLabels = " . json_encode($wsc->getAllowedLabels()) . ";";
         // disabled columns
-        $jResult .= "disabledColumns = " . json_encode($this->getDisabledColumns()) . ";";
-        $jResult .= "hiddenLabels = " . json_encode($this->getHiddenLabels()) . ";";
+        $jResult .= "disabledColumns = " . json_encode($wsc->getDisabledColumns()) . ";";
+        $jResult .= "hiddenLabels = " . json_encode($wsc->getHiddenLabels()) . ";";
 
         // infos for current user
         $userinfos = Array(
-            "username" => $this->getUsername(),
-            "admin" => $this->isAdmin(),
+            "username" => $wsc->getUsername(),
+            "admin" => $wsc->isAdmin(),
         );
         $jResult .= "userinfo = " . json_encode($userinfos) . ";";
 
         // Overriding context menu routine
-        $jEnd .= $this->getContextMenu();
+        $jEnd .= $wsc->getContextMenu();
 
         // Disabling manually add torrent
-        $this->disableAddTorrent();
+        $jEnd .= $wsc->disableAddTorrent();
 
         // Disabling start a download without a label set
-        $jEnd .= $this->disallowStartsWithoutLabel();
+        $jEnd .= $wsc->disallowStartsWithoutLabel();
 
         // Overriding start torrent
-        $jEnd .= $this->getStartCmd();
+        $jEnd .= $wsc->getStartCmd();
 
-
+        return;
         // Restricting access to users
-        if (!$this->isAdmin()) {
+        if (!$wsc->isAdmin()) {
             // Removing unwanted menu items
-            $jEnd .= $this->addJsDelay($this->removeMenus(), 200);
-            $jEnd .= $this->removeSettings();
-            $jEnd .= $this->addJsDelay($this->disableColumns(), 300);
+            $jEnd .= $wsc->addJsDelay($wsc->removeMenus(), 200);
+            $jEnd .= $wsc->removeSettings();
+            $jEnd .= $wsc->addJsDelay($wsc->disableColumns(), 300);
         }
 
     }

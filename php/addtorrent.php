@@ -6,7 +6,7 @@ set_time_limit(0);
 
 if(isset($_REQUEST['result']))
 {
-	if(isset($_REQUEST['json']))	
+	if(isset($_REQUEST['json']))
 		cachedEcho( '{ "result" : "'.$_REQUEST['result'][0].'" }',"application/json");
 	else
 	{
@@ -22,8 +22,12 @@ else
 {
 	$uploaded_files = array();
 	$label = null;
-	if(isset($_REQUEST['label']))	
+	$owner = null;
+	if(isset($_REQUEST['label']))
 		$label = trim($_REQUEST['label']);
+	if(isset($_REQUEST['owner']))
+		$owner = trim($_REQUEST['owner']);
+
 	$dir_edit = null;
 	if(isset($_REQUEST['dir_edit']))
 	{
@@ -37,7 +41,7 @@ else
 		{
 			if( is_array($_FILES['torrent_file']['name']) )
 			{
-				for ($i = 0; $i<count($_FILES['torrent_file']['name']); ++$i) 
+				for ($i = 0; $i<count($_FILES['torrent_file']['name']); ++$i)
 				{
 		                        $files[] = array
         		                (
@@ -91,7 +95,7 @@ else
 					}
 					else
 						$uploaded_url['status'] = "FailedURL";
-				}	
+				}
 				$uploaded_files[] = $uploaded_url;
 			}
 		}
@@ -115,6 +119,18 @@ else
 			{
 				if(isset($_REQUEST['randomize_hash']))
 					$torrent->info['unique'] = uniqid("rutorrent-",true);
+
+					if($owner){
+						$req = new rXMLRPCRequest(
+							 array(
+											new rXMLRPCCommand("string",$torrent->info['unique']),
+											new rXMLRPCCommand('string', 'owner'),
+											new rXMLRPCCommand('string', $owner),
+										)
+						);
+						$req->run();
+					}
+
 				if(rTorrent::sendTorrent($torrent,
 					!isset($_REQUEST['torrents_start_stopped']),
 					!isset($_REQUEST['not_add_path']),

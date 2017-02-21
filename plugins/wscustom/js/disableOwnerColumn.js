@@ -1,10 +1,4 @@
-/**
- * Created with JetBrains PhpStorm.
- * User: barilc
- * Date: 9/17/13
- * Time: 8:32 AM
- * To change this template use File | Settings | File Templates.
- */
+
 var cols = theWebUI.getTable('trt').colsdata;
 for (var i = 0; i < cols.length; i++) {
     if (cols[i].id === 'owner') {

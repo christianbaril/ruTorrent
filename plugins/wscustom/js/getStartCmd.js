@@ -1,9 +1,4 @@
-/**
- * Created with JetBrains PhpStorm.
- * User: barilc
- * Date: 9/17/13
- * Time: 8:39 AM
- */
+
 $(document).ready(function () {
     var rTorrentStubStart = rTorrentStub.prototype.start;
 

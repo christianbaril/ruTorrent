@@ -132,9 +132,9 @@ else
 
 						$cmd = new rXMLRPCCommand('d.set_custom');
 						// Add owner for the torrent that matches the hashes
-						$cmd->addParameter('string', $hash);
-						$cmd->addParameter('string', 'owner');
-						$cmd->addParameter('string', $owner);
+						$cmd->addParameter($hash,'string');
+						$cmd->addParameter('owner','string');
+						$cmd->addParameter($owner,'string');
 						$cmd->run();
 				}
 			}

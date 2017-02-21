@@ -101,7 +101,7 @@ if (isset($_REQUEST['result'])) {
                     $cmd = new rXMLRPCCommand('d.set_custom', array(
                         $torrent->info['unique'],
                         'owner',
-                        'mrb'
+                        $owner
                     ));
 
                     $req->addCommand($cmd);
@@ -130,7 +130,7 @@ if (isset($_REQUEST['result'])) {
                     $cmd = new rXMLRPCCommand('d.set_custom', array(
                         $hash,
                         'owner',
-                        'mrb'
+                        $owner
                     ));
 
                     $req->addCommand($cmd);

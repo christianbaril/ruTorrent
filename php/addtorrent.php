@@ -84,6 +84,25 @@ if (isset($_REQUEST['result'])) {
             $file['file'] = realpath($file['file']);
             @chmod($file['file'], $profileMask & 0666);
             $torrent = new Torrent($file['file']);
+            $torrent->hash_info();
+
+            $owner = null;
+            if (isset($_REQUEST['owner']))
+                $owner = trim($_REQUEST['owner']);
+
+            $req = new rXMLRPCRequest();
+
+            // Add owner for the torrent that matches the hashes
+            $cmd = new rXMLRPCCommand('d.set_custom', array(
+                $torrent->hash_info(),
+                'owner',
+                $owner
+            ));
+
+            $req->addCommand($cmd);
+            $req->run();
+
+
             if ($torrent->errors()) {
                 unlink($file['file']);
                 $file['status'] = "FailedFile";
@@ -118,25 +137,26 @@ if (isset($_REQUEST['result'])) {
                 if ($hash === false) {
                     unlink($file['file']);
                     $file['status'] = "Failed";
-                } else {
-
-                    $owner = null;
-                    if (isset($_REQUEST['owner']))
-                        $owner = trim($_REQUEST['owner']);
-
-                    $req = new rXMLRPCRequest();
-
-                    // Add owner for the torrent that matches the hashes
-                    $cmd = new rXMLRPCCommand('d.set_custom', array(
-                        $hash,
-                        'owner',
-                        $owner
-                    ));
-
-                    $req->addCommand($cmd);
-                    $req->run();
-
                 }
+
+                $owner = null;
+
+                if (isset($_REQUEST['owner']))
+                    $owner = trim($_REQUEST['owner']);
+
+                $req = new rXMLRPCRequest();
+
+                // Add owner for the torrent that matches the hashes
+                $cmd = new rXMLRPCCommand('d.set_custom', array(
+                    $hash,
+                    'owner',
+                    $owner
+                ));
+
+                $req->addCommand($cmd);
+                $req->run();
+
+
             }
         }
         $location .= ('result[]=' . $file['status'] . '&');

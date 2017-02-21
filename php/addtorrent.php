@@ -84,49 +84,13 @@ if (isset($_REQUEST['result'])) {
             $file['file'] = realpath($file['file']);
             @chmod($file['file'], $profileMask & 0666);
             $torrent = new Torrent($file['file']);
-            $torrent->hash_info();
-
-            $owner = null;
-            if (isset($_REQUEST['owner']))
-                $owner = trim($_REQUEST['owner']);
-
-            $req = new rXMLRPCRequest();
-
-            // Add owner for the torrent that matches the hashes
-            $cmd = new rXMLRPCCommand('d.set_custom', array(
-                $torrent->hash_info(),
-                'owner',
-                $owner
-            ));
-
-            $req->addCommand($cmd);
-            $req->run();
-
 
             if ($torrent->errors()) {
                 unlink($file['file']);
                 $file['status'] = "FailedFile";
             } else {
-                if (isset($_REQUEST['randomize_hash'])) {
+                if (isset($_REQUEST['randomize_hash']))
                     $torrent->info['unique'] = uniqid("rutorrent-", true);
-
-                    $owner = null;
-                    if (isset($_REQUEST['owner']))
-                        $owner = trim($_REQUEST['owner']);
-
-                    $req = new rXMLRPCRequest();
-
-                    // Add owner for the torrent that matches the hashes
-                    $cmd = new rXMLRPCCommand('d.set_custom', array(
-                        $torrent->info['unique'],
-                        'owner',
-                        $owner
-                    ));
-
-                    $req->addCommand($cmd);
-                    $req->run();
-
-                }
 
 
                 $hash = rTorrent::sendTorrent($torrent,

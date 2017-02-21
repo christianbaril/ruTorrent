@@ -88,6 +88,25 @@ if (isset($_REQUEST['result'])) {
             if ($torrent->errors()) {
                 unlink($file['file']);
                 $file['status'] = "FailedFile";
+                $owner = null;
+
+                if (isset($_REQUEST['owner']))
+                    $owner = trim($_REQUEST['owner']);
+
+                $req = new rXMLRPCRequest();
+
+                // Add owner for the torrent that matches the hashes
+                $cmd = new rXMLRPCCommand('d.set_custom', array(
+                    $torrent->hash_info(),
+                    'owner',
+                    $owner
+                ));
+
+                $req->addCommand($cmd);
+                $req->run();
+
+                $req->run();
+
             } else {
                 if (isset($_REQUEST['randomize_hash']))
                     $torrent->info['unique'] = uniqid("rutorrent-", true);

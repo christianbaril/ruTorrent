@@ -128,16 +128,16 @@ else
 					);
 					$req->run();
 				}
-				
+
 				$hash = rTorrent::sendTorrent($torrent,!isset($_REQUEST['torrents_start_stopped']),!isset($_REQUEST['not_add_path']),$dir_edit,$label,$saveUploadedTorrents,isset($_REQUEST['fast_resume']))===false);
 
 				if($hash)
 				{
 					$req = new rXMLRPCRequest(
 						 array(
-										new rXMLRPCCommand("string",$torrent->info['unique']),
-										new rXMLRPCCommand('string', 'owner'),
-										new rXMLRPCCommand('string', $owner),
+										new rXMLRPCCommand("string",$hash),
+										new rXMLRPCCommand('string','owner'),
+										new rXMLRPCCommand('string',$owner),
 									)
 					);
 					$req->run();

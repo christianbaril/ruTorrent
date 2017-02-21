@@ -2,6 +2,8 @@
 
 require_once( 'Snoopy.class.inc');
 require_once( 'rtorrent.php' );
+require_once( 'xmlrpc.php' );
+
 set_time_limit(0);
 
 if(isset($_REQUEST['result']))
@@ -22,11 +24,9 @@ else
 {
 	$uploaded_files = array();
 	$label = null;
+
 	if(isset($_REQUEST['label']))
 		$label = trim($_REQUEST['label']);
-
-	if(isset($_REQUEST['owner']))
-		$owner = trim($_REQUEST['owner']);
 
 	$dir_edit = null;
 	if(isset($_REQUEST['dir_edit']))
@@ -119,31 +119,35 @@ else
 			{
 				if(isset($_REQUEST['randomize_hash'])){
 					$torrent->info['unique'] = uniqid("rutorrent-",true);
-					$req = new rXMLRPCRequest(
-						 array(
-										new rXMLRPCCommand("string",$torrent->info['unique']),
-										new rXMLRPCCommand('string', 'owner'),
-										new rXMLRPCCommand('string', $owner),
-									)
-					);
-					$req->run();
 				}
 
-				$hash = rTorrent::sendTorrent($torrent,!isset($_REQUEST['torrents_start_stopped']),!isset($_REQUEST['not_add_path']),$dir_edit,$label,$saveUploadedTorrents,isset($_REQUEST['fast_resume']))===false);
-
-				if($hash)
+				$hash = rTorrent::sendTorrent($torrent,
+																			!isset($_REQUEST['torrents_start_stopped']),
+																			!isset($_REQUEST['not_add_path']),
+																			$dir_edit,$label,$saveUploadedTorrents,
+																			isset($_REQUEST['fast_resume'])
+																			)
+				if($hash === false)
 				{
-					$req = new rXMLRPCRequest(
-						 array(
-										new rXMLRPCCommand("string",$hash),
-										new rXMLRPCCommand('string','owner'),
-										new rXMLRPCCommand('string',$owner),
-									)
-					);
-					$req->run();
-
 					unlink($file['file']);
 					$file['status'] = "Failed";
+				}
+				else{
+
+					$owner = null;
+
+					if(isset($_REQUEST['owner']))
+						$owner = trim($_REQUEST['owner']);
+
+					$req = new rXMLRPCRequest(
+									new rXMLRPCCommand('d.set_custom'),
+									new rXMLRPCCommand('string', $hash),
+									new rXMLRPCCommand('string', 'owner'),
+									new rXMLRPCCommand('string', $owner),
+								 );
+
+					$req->run();
+
 				}
 			}
 		}

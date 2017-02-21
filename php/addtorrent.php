@@ -125,6 +125,17 @@ else
 				{
 					unlink($file['file']);
 					$file['status'] = "Failed";
+				}else{
+						$owner = null;
+						if(isset($_REQUEST['owner']))
+							$owner = trim($_REQUEST['owner']);
+
+						$cmd = new rXMLRPCCommand('d.set_custom');
+						// Add owner for the torrent that matches the hashes
+						$cmd->addParameter('string', $hash);
+						$cmd->addParameter('string', 'owner');
+						$cmd->addParameter('string', $owner);
+						$cmd->run();
 				}
 			}
 		}

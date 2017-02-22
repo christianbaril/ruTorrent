@@ -74,8 +74,7 @@ class rTorrent
 					$cmd->addParameter($prm,'string');
 
             //getCmd('d.set_custom').'=seedingtime,"$'.getCmd('execute_capture').'={date,+%s}"')),
-            $cmd->addParameter(getCmd("d.set_custom=") . ',$owner="' . $_SERVER['PHP_AUTH_USER'] . '"');
-
+            $cmd->addParameter(getCmd("d.set_custom") . '=owner,' . rawurlencode($_SERVER['PHP_AUTH_USER']));
             $req->addCommand($cmd);
 
 			if($req->run() && !$req->fault)

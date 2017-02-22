@@ -39,7 +39,7 @@ class wsCustomization
         // infos for current user
         $userinfos = Array(
             "username" => $this->getUsername(),
-            "admin"    => $this->isAdmin(trim($_SERVER['PHP_AUTH_USER'])),
+            "admin"    => $this->isAdmin(),
         );
         $jResult .= "userinfo = " . json_encode($userinfos) . ";";
 
@@ -55,9 +55,8 @@ class wsCustomization
         // Overriding start torrent
         $jEnd .= $this->getStartCmd();
 
-
         // Restricting access to users
-        if (!$this->isAdmin($this->getUsername())) {
+        if (!$this->isAdmin()) {
             // Removing unwanted menu items
             $jEnd .= $this->addJsDelay($this->removeMenus(), 200);
             $jEnd .= $this->removeSettings();
@@ -142,9 +141,9 @@ class wsCustomization
      * isAdmin
      * @return bool
      */
-    public function isAdmin($username = null)
+    public function isAdmin()
     {
-        return in_array($username, $this->getAdmins());
+        return in_array($this->username, $this->getAdmins());
     }
 
     /**

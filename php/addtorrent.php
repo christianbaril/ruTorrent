@@ -102,21 +102,6 @@ if (isset($_REQUEST['result'])) {
                     unlink($file['file']);
                     $file['status'] = "Failed";
                 }
-
-                if ($torrent->hash_info()) {
-                    $PHP_AUTH_USER = null;
-                    if (isset($_SERVER['PHP_AUTH_USER']))
-                        $PHP_AUTH_USER = trim($_SERVER['PHP_AUTH_USER']);
-                    $req = new rXMLRPCRequest();
-                    // Add owner for the torrent that matches the hashes
-                    $cmd = new rXMLRPCCommand('d.set_custom', array(
-                        $torrent->hash_info(),
-                        'owner',
-                        $PHP_AUTH_USER
-                    ));
-                    $req->addCommand($cmd);
-                    $req->run();
-                }
             }
         }
         $location .= ('result[]=' . $file['status'] . '&');

@@ -57,7 +57,7 @@ class wsCustomization
 
 
         // Restricting access to users
-        if (!$this->isAdmin()) {
+        if (!$this->isAdmin($this->getUsername())) {
             // Removing unwanted menu items
             $jEnd .= $this->addJsDelay($this->removeMenus(), 200);
             $jEnd .= $this->removeSettings();
@@ -144,10 +144,6 @@ class wsCustomization
      */
     public function isAdmin($username = null)
     {
-        if ($username == null) {
-            $username = $this->username;
-        }
-
         return in_array($username, $this->getAdmins());
     }
 

@@ -1,5 +1,6 @@
 plugin.ownersLabels = {};
 
+
 rTorrentStub.prototype.preventautodelete = function () {
     for (var i = 0; i < this.hashes.length; i++) {
         // Create new command for custom information

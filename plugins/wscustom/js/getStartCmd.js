@@ -1,4 +1,3 @@
-
 $(document).ready(function () {
     var rTorrentStubStart = rTorrentStub.prototype.start;
 
@@ -7,7 +6,7 @@ $(document).ready(function () {
         rTorrentStubStart.call(this);
 
         for (var i = 0; i < this.hashes.length; i++) {
-
+//            var owner = theWebUI.getTable('trt').getValueById(this.hashes[i], 'owner');
             var owner = theWebUI.torrents[this.hashes[i]].owner;
             
             if (owner == '') {

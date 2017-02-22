@@ -1,5 +1,7 @@
 theWebUI.perform = function (cmd) {
+
     if (cmd == "pause") {
+
         var h = this.getHashes("unpause");
         if (h != "") {
             var theHash = h.split('&hash=');
@@ -13,8 +15,10 @@ theWebUI.perform = function (cmd) {
                     }
                 }
             });
+
             if (!canStart)
                 return;
+
             this.request("?action=unpause" + h);
         }
     }

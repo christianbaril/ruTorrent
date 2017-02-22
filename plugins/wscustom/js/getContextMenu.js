@@ -40,5 +40,7 @@ $(document).ready(function () {
             theContextMenu.add([CMENU_SEP]);
             theContextMenu.add([('Remove and delete data'), (table.selCount > 1) || this.isTorrentCommandEnabled('remove', id) ? 'theWebUI.removeWithData()' : null]);
         }
+
+//        theContextMenu.add([theUILang.Remove, (table.selCount > 1) || this.isTorrentCommandEnabled("remove", id) ? "theWebUI.remove()" : null]);
     };
 });

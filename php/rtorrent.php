@@ -75,7 +75,6 @@ class rTorrent
 
             if (isset($_SERVER['PHP_AUTH_USER'])) {
                 $cmd->addParameter(getCmd("d.set_custom") . '=owner,' . rawurlencode(trim($_SERVER['PHP_AUTH_USER'])));
-                $cmd->addParameter(getCmd("d.set_directory_base="));
             }
 
             $req->addCommand($cmd);

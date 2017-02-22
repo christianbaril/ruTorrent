@@ -142,8 +142,12 @@ class wsCustomization
      * isAdmin
      * @return bool
      */
-    public function isAdmin($username)
+    public function isAdmin($username = null)
     {
+        if ($username == null) {
+            $username = $this->username;
+        }
+
         return in_array($username, $this->getAdmins());
     }
 

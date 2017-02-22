@@ -79,7 +79,6 @@ class rTorrent
                 $cmd->addParameter(getCmd("d.set_directory=/glftpd/home/rtorrent/" . $label));
             }
 
-
             $req->addCommand($cmd);
 
 			if($req->run() && !$req->fault)

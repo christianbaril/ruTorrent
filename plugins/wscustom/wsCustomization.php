@@ -23,44 +23,47 @@ class wsCustomization
     /***
      * init
      */
-    public function init()
+    public static function init()
     {
         global $jEnd, $jResult;
+
+        $wsc = new wsCustomization();
 
         /**
          * Common stuff
          */
         // labels
-        $jResult .= "allowedLabels = " . json_encode($this->getAllowedLabels()) . ";";
+        $jResult .= "allowedLabels = " . json_encode($wsc->getAllowedLabels()) . ";";
         // disabled columns
-        $jResult .= "disabledColumns = " . json_encode($this->getDisabledColumns()) . ";";
-        $jResult .= "hiddenLabels = " . json_encode($this->getHiddenLabels()) . ";";
+        $jResult .= "disabledColumns = " . json_encode($wsc->getDisabledColumns()) . ";";
+        $jResult .= "hiddenLabels = " . json_encode($wsc->getHiddenLabels()) . ";";
 
         // infos for current user
         $userinfos = Array(
-            "username" => $this->getUsername(),
-            "admin"    => $this->isAdmin(),
+            "username" => $wsc->getUsername(),
+            "admin"    => $wsc->isAdmin(),
         );
         $jResult .= "userinfo = " . json_encode($userinfos) . ";";
 
         // Overriding context menu routine
-        $jEnd .= $this->getContextMenu();
+        $jEnd .= $wsc->getContextMenu();
 
         // Disabling manually add torrent
-        $this->disableAddTorrent();
+        $wsc->disableAddTorrent();
 
         // Disabling start a download without a label set
-        $jEnd .= $this->disallowStartsWithoutLabel();
+        $jEnd .= $wsc->disallowStartsWithoutLabel();
 
         // Overriding start torrent
-        $jEnd .= $this->getStartCmd();
+        $jEnd .= $wsc->getStartCmd();
+
 
         // Restricting access to users
-        if (!$this->isAdmin()) {
+        if (!$wsc->isAdmin()) {
             // Removing unwanted menu items
-            $jEnd .= $this->addJsDelay($this->removeMenus(), 200);
-            $jEnd .= $this->removeSettings();
-            $jEnd .= $this->addJsDelay($this->disableColumns(), 300);
+            $jEnd .= $wsc->addJsDelay($wsc->removeMenus(), 200);
+            $jEnd .= $wsc->removeSettings();
+            $jEnd .= $wsc->addJsDelay($wsc->disableColumns(), 300);
         }
 
     }
@@ -143,12 +146,9 @@ class wsCustomization
      */
     public function isAdmin()
     {
-        return in_array($this->username, $this->getAdmins());
+        return in_array($_SERVER['PHP_AUTH_USER'], $this->getAdmins());
     }
 
-    /**
-     * @return array
-     */
     private function getAdmins()
     {
         return array(

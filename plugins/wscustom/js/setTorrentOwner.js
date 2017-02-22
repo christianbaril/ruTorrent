@@ -1,10 +1,3 @@
-/**
- * Created with JetBrains PhpStorm.
- * User: barilc
- * Date: 9/18/13
- * Time: 11:14 AM
- * To change this template use File | Settings | File Templates.
- */
 $(document).ready(function () {
 
     var rTorrentStubStart = rTorrentStub.prototype.start;

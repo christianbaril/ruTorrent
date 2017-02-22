@@ -11,11 +11,9 @@ eval(getPluginConf('wsCustomization'));
 class wsCustomization
 {
     public $hash = "wsCustomization.dat";
+    public $allowedLabels;
     private $path;
     private $username;
-
-    public $allowedLabels;
-
 
     function __construct()
     {
@@ -23,40 +21,59 @@ class wsCustomization
         $this->setUsername($_SERVER['PHP_AUTH_USER']);
     }
 
-    /**
-     * @return mixed
+    /***
+     * init
      */
-    public function getUsername()
+    public static function init()
     {
-        return $this->username;
-    }
+        global $jEnd, $jResult;
 
-    /**
-     * @param mixed $username
-     */
-    public function setUsername($username)
-    {
-        $this->username = $username;
-    }
+        $wsc = new wsCustomization();
 
-    /**
-     * isAdmin
-     * @return bool
-     */
-    public static function isAdmin()
-    {
-        return in_array($_SERVER['PHP_AUTH_USER'], array(
-            'wicked',
-            'mrb',
-        )
-      );
+        /**
+         * Common stuff
+         */
+        // labels
+        $jResult .= "allowedLabels = " . json_encode($wsc->getAllowedLabels()) . ";";
+        // disabled columns
+        $jResult .= "disabledColumns = " . json_encode($wsc->getDisabledColumns()) . ";";
+        $jResult .= "hiddenLabels = " . json_encode($wsc->getHiddenLabels()) . ";";
+
+        // infos for current user
+        $userinfos = Array(
+            "username" => $wsc->getUsername(),
+            "admin"    => $wsc->isAdmin(),
+        );
+        $jResult .= "userinfo = " . json_encode($userinfos) . ";";
+
+        // Overriding context menu routine
+        $jEnd .= $wsc->getContextMenu();
+
+        // Disabling manually add torrent
+        $jEnd .= $wsc->disableAddTorrent();
+
+        // Disabling start a download without a label set
+        $jEnd .= $wsc->disallowStartsWithoutLabel();
+
+        // Overriding start torrent
+        $jEnd .= $wsc->getStartCmd();
+
+        return;
+        // Restricting access to users
+        if (!$wsc->isAdmin()) {
+            // Removing unwanted menu items
+            $jEnd .= $wsc->addJsDelay($wsc->removeMenus(), 200);
+            $jEnd .= $wsc->removeSettings();
+            $jEnd .= $wsc->addJsDelay($wsc->disableColumns(), 300);
+        }
+
     }
 
     /**
      * getAllowedLabels
      * @return array
      */
-    public static function  getAllowedLabels()
+    public static function getAllowedLabels()
     {
         return array(
             'Anime',
@@ -81,7 +98,7 @@ class wsCustomization
      * getDisabledColumns
      * @return array
      */
-    public static function  getDisabledColumns()
+    public static function getDisabledColumns()
     {
         return array(
             'ratioday',
@@ -109,11 +126,41 @@ class wsCustomization
     }
 
     /**
+     * @return mixed
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param mixed $username
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+    }
+
+    /**
+     * isAdmin
+     * @return bool
+     */
+    public static function isAdmin()
+    {
+        return in_array($_SERVER['PHP_AUTH_USER'], array(
+                'wicked',
+                'mrb',
+            )
+        );
+    }
+
+    /**
+     * getContextMenu
      * @return string
      */
-    public function disableAddTorrent()
+    public function getContextMenu()
     {
-        return file_get_contents($this->getPath() . '/js/disableAddTorrent.js');
+        return file_get_contents($this->getPath() . '/js/getContextMenu.js');
     }
 
     /**
@@ -131,6 +178,32 @@ class wsCustomization
     public function setPath()
     {
         $this->path = dirname(__FILE__);
+    }
+
+    /**
+     * @return string
+     */
+    public function disableAddTorrent()
+    {
+        return file_get_contents($this->getPath() . '/js/disableAddTorrent.js');
+    }
+
+    /**
+     * disallowStartsWithoutLabel
+     * @return string
+     */
+    public function disallowStartsWithoutLabel()
+    {
+        return file_get_contents($this->getPath() . '/js/disallowStartsWithoutLabel.js');
+    }
+
+    /**
+     * getStartCmd
+     * @return string
+     */
+    public function getStartCmd()
+    {
+        return file_get_contents($this->getPath() . '/js/getStartCmd.js');
     }
 
     /**
@@ -160,85 +233,8 @@ class wsCustomization
         return file_get_contents($this->getPath() . '/js/disableColumns.js');
     }
 
-    /**
-     * getContextMenu
-     * @return string
-     */
-    public function getContextMenu()
-    {
-        return file_get_contents($this->getPath() . '/js/getContextMenu.js');
-    }
-
-    /**
-     * getStartCmd
-     * @return string
-     */
-    public function getStartCmd()
-    {
-        return file_get_contents($this->getPath() . '/js/getStartCmd.js');
-    }
-
-    /**
-     * disallowStartsWithoutLabel
-     * @return string
-     */
-    public function disallowStartsWithoutLabel()
-    {
-        return file_get_contents($this->getPath() . '/js/disallowStartsWithoutLabel.js');
-    }
-
-
     public function addJsDelay($javascript, $milliseconds)
     {
         return "setTimeout(function() {  $javascript  }, $milliseconds);";;
     }
-
-    /***
-     * init
-     */
-    public static function init()
-    {
-        global $jEnd, $jResult;
-
-        $wsc = new wsCustomization();
-
-        /**
-         * Common stuff
-         */
-        // labels
-        $jResult .= "allowedLabels = " . json_encode($wsc->getAllowedLabels()) . ";";
-        // disabled columns
-        $jResult .= "disabledColumns = " . json_encode($wsc->getDisabledColumns()) . ";";
-        $jResult .= "hiddenLabels = " . json_encode($wsc->getHiddenLabels()) . ";";
-
-        // infos for current user
-        $userinfos = Array(
-            "username" => $wsc->getUsername(),
-            "admin" => $wsc->isAdmin(),
-        );
-        $jResult .= "userinfo = " . json_encode($userinfos) . ";";
-
-        // Overriding context menu routine
-        $jEnd .= $wsc->getContextMenu();
-
-        // Disabling manually add torrent
-        $jEnd .= $wsc->disableAddTorrent();
-
-        // Disabling start a download without a label set
-        $jEnd .= $wsc->disallowStartsWithoutLabel();
-
-        // Overriding start torrent
-        $jEnd .= $wsc->getStartCmd();
-
-        return;
-        // Restricting access to users
-        if (!$wsc->isAdmin()) {
-            // Removing unwanted menu items
-            $jEnd .= $wsc->addJsDelay($wsc->removeMenus(), 200);
-            $jEnd .= $wsc->removeSettings();
-            $jEnd .= $wsc->addJsDelay($wsc->disableColumns(), 300);
-        }
-
-    }
-
 }

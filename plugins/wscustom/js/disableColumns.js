@@ -1,4 +1,3 @@
-
 var cols = theWebUI.getTable('trt').colsdata;
 
 for (i in cols) {
@@ -13,7 +12,7 @@ dxSTable.prototype.toggleColumn = function (i) {
         // Column not in disabledColumns ?
         tableToggleColumn.call(this, i);
     }
-}
+};
 
 dxSTable.prototype.onRightClick = function (e) {
     if (e.which === 3 && !this.isMoving) {
@@ -31,6 +30,6 @@ dxSTable.prototype.onRightClick = function (e) {
         }
         theContextMenu.setNoHide();
         theContextMenu.show(e.clientX, e.clientY);
-        return(false);
+        return (false);
     }
-}
+};

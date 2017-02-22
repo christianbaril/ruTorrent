@@ -1,5 +1,4 @@
-plugin.ownersLabels = new Object();
-
+plugin.ownersLabels = {};
 
 rTorrentStub.prototype.preventautodelete = function () {
     for (var i = 0; i < this.hashes.length; i++) {
@@ -16,7 +15,7 @@ rTorrentStub.prototype.preventautodelete = function () {
         }
         this.commands.push(cmd);
     }
-}
+};
 
 theWebUI.setPreventAutoDelete = function () {
     theWebUI.perform("preventautodelete");
@@ -28,7 +27,7 @@ theWebUI.filterByLabel = function (hash) {
         theWebUI.filterByOwner(theWebUI.actLbl.replace(/^i/, ''));
     else
         plugin.filterByLabel.call(theWebUI, hash);
-}
+};
 
 theWebUI.filterByOwner = function (owner) {
     var table = this.getTable("trt");
@@ -39,7 +38,7 @@ theWebUI.filterByOwner = function (owner) {
         else
             table.hideRow(hash);
     }
-}
+};
 
 plugin.config = theWebUI.config;
 theWebUI.config = function (data) {
@@ -60,13 +59,13 @@ theWebUI.config = function (data) {
     plugin.config.call(this, data);
 
     plugin.reqOwner = theRequestManager.addRequest('trt', theRequestManager
-        .map('d.get_custom=')
+            .map('d.get_custom=')
         + 'owner', function (hash, torrent, value) {
         torrent.owner = value;
     });
 
     plugin.reqKeep = theRequestManager.addRequest('trt', theRequestManager
-        .map('d.get_custom=')
+            .map('d.get_custom=')
         + 'keep', function (hash, torrent, value) {
         torrent.keep = value;
     });
@@ -84,8 +83,8 @@ plugin.onRemove = function () {
 
 
 plugin.isActualLabel = function (lbl) {
-    return(theWebUI.actLbl && $($$(theWebUI.actLbl)).hasClass('owner') && ('i' + lbl == theWebUI.actLbl));
-}
+    return (theWebUI.actLbl && $($$(theWebUI.actLbl)).hasClass('owner') && ('i' + lbl == theWebUI.actLbl));
+};
 
 // update labels ..
 plugin.updateLabels = theWebUI.updateLabels;
@@ -96,14 +95,14 @@ theWebUI.updateLabels = function (wasRemoved) {
             theWebUI.rebuildOwnersLabels();
         }
     }
-}
+};
 
 plugin.addTrackers = theWebUI.addTrackers;
 theWebUI.addTrackers = function (data) {
     plugin.addTrackers.call(theWebUI, data);
     if (plugin.enabled)
         theWebUI.rebuildOwnersLabels();
-}
+};
 
 theWebUI.rebuildOwnersLabels = function () {
 
@@ -116,7 +115,7 @@ theWebUI.rebuildOwnersLabels = function () {
     else {
 
         var table = this.getTable('trt');
-        var ownersLabels = new Object();
+        var ownersLabels = {};
 
         var tArray = [];
 
@@ -145,7 +144,7 @@ theWebUI.rebuildOwnersLabels = function () {
             ownersLabelsSize[i] = theConverter.bytes(ownersLabelsSize[i], 2) + " / " + ownersLabels[i];
         }
 
-        var keys = new Array();
+        var keys = [];
 
         for (var lbl in ownersLabels) {
             keys.push(lbl);
@@ -168,9 +167,7 @@ theWebUI.rebuildOwnersLabels = function () {
                 li.children("span").text(ownersLabelsSize[lbl]);
             } else {
 
-                li = $('<li>').attr("id", 'i' + lbl).
-                    html(escapeHTML(lbl) + '&nbsp;(<span id="-' + lbl + '_c">' + ownersLabelsSize[lbl] + '</span>)').
-                    mouseclick(theWebUI.ownersLabelContextMenu).addClass("cat owner").attr("title", lbl + " (" + ownersLabels[lbl] + ")");
+                li = $('<li>').attr("id", 'i' + lbl).html(escapeHTML(lbl) + '&nbsp;(<span id="-' + lbl + '_c">' + ownersLabelsSize[lbl] + '</span>)').mouseclick(theWebUI.ownersLabelContextMenu).addClass("cat owner").attr("title", lbl + " (" + ownersLabels[lbl] + ")");
                 ul.append(li);
 
             }
@@ -191,7 +188,7 @@ theWebUI.rebuildOwnersLabels = function () {
         if (needSwitch)
             theWebUI.switchLabel($$("-_-_-all-_-_-"));
     }
-}
+};
 
 theWebUI.ownersLabelContextMenu = function (e) {
     var ownerid = this.id.replace(/^i/, '');
@@ -212,8 +209,8 @@ theWebUI.ownersLabelContextMenu = function (e) {
     }
     else
         theWebUI.switchLabel(this);
-    return(false);
-}
+    return (false);
+};
 
 
 theWebUI.initOwnersLabels = function () {

@@ -1,4 +1,3 @@
-
 var cols = theWebUI.getTable('trt').colsdata;
 for (var i = 0; i < cols.length; i++) {
     if (cols[i].id === 'owner') {
@@ -13,7 +12,7 @@ dxSTable.prototype.toggleColumn = function (i) {
     if (this.colsdata[i].enabled || this.colsdata[i].id !== 'owner') {
         tableToggleColumn.call(this, i);
     }
-}
+};
 dxSTable.prototype.onRightClick = function (e) {
     if (e.which === 3 && !this.isMoving) {
         theContextMenu.clear();
@@ -29,6 +28,6 @@ dxSTable.prototype.onRightClick = function (e) {
         }
         theContextMenu.setNoHide();
         theContextMenu.show(e.clientX, e.clientY);
-        return(false);
+        return (false);
     }
-}
+};

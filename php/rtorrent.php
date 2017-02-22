@@ -68,7 +68,6 @@ class rTorrent
 				$label = rawurlencode($label);
                 if (strlen($label) <= 4096) {
                     $cmd->addParameter(getCmd("d.set_custom1=") . $label);
-                    $cmd->addParameter(getCmd("d.set_directory=/glftpd/home/rtorrent/") . $label);
                 }
 			}
 			if(is_array($addition))
@@ -78,6 +77,8 @@ class rTorrent
             if (isset($_SERVER['PHP_AUTH_USER'])) {
                 $cmd->addParameter(getCmd("d.set_custom") . '=owner,' . rawurlencode(trim($_SERVER['PHP_AUTH_USER'])));
             }
+
+            $cmd->addParameter(getCmd("d.set_directory=/glftpd/home/rtorrent/"));
 
             $req->addCommand($cmd);
 

@@ -21,7 +21,7 @@ class rTorrent
 				{
 					if(isset($torrent->{'libtorrent_resume'}))
 						unset($torrent->{'libtorrent_resume'});
-				}			
+                }
 			if($isNew)
 			{
 				if(isset($torrent->{'rtorrent'}))
@@ -43,7 +43,7 @@ class rTorrent
 			}
 			if(!is_null($filename) && (rTorrentSettings::get()->iVersion>=0x805))
 				$cmd->addParameter(getCmd("d.set_custom")."=x-filename,".rawurlencode(getFileName($filename)));
-			$req = new rXMLRPCRequest();				
+            $req = new rXMLRPCRequest();
 			if($directory && (strlen($directory)>0))
 			{
 				if(!rTorrentSettings::get()->correctDirectory($directory))
@@ -73,17 +73,8 @@ class rTorrent
 				foreach($addition as $key=>$prm)
 					$cmd->addParameter($prm,'string');
 
-            $req->addCommand($cmd);
-
-            // Add owner for the torrent that matches the hashes
-            $PHP_AUTH_USER = null;
-            if (isset($_SERVER['PHP_AUTH_USER']))
-                $PHP_AUTH_USER = trim($_SERVER['PHP_AUTH_USER']);
-
-            $cmd = new rXMLRPCCommand('d.set_custom', array(
-                'owner',
-                $PHP_AUTH_USER
-            ));
+            //getCmd('d.set_custom').'=seedingtime,"$'.getCmd('execute_capture').'={date,+%s}"')),
+            $cmd->addParameter(getCmd("d.set_custom=") . ',$owner="' . $_SERVER['PHP_AUTH_USER'] . '"');
 
             $req->addCommand($cmd);
 

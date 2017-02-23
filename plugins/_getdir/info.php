@@ -28,7 +28,7 @@ if(isset($_REQUEST['mode']))
 	if(in_array("labels",$modes))
 	{
 		$req = new rXMLRPCRequest( new rXMLRPCCommand("d.multicall", array("",getCmd("d.get_custom1="))) );
-        $labels = array();
+        /*$labels = array();
         if ($req->run() && !$req->fault) {
             for ($i = 0; $i < count($req->val); $i++) {
                 $val = trim(rawurldecode($req->val[$i]));
@@ -39,6 +39,8 @@ if(isset($_REQUEST['mode']))
             natcasesort($output["labels"]);
             $output["labels"] = array_values($output["labels"]);
         }
+        */
+        $output["labels"] = wsCustomization::getAllowedLabels();
 	}
 	if(in_array("dirlist",$modes))
 	{

@@ -1,6 +1,7 @@
 <?php
 require_once( '../../php/util.php' );
 require_once( '../../php/settings.php' );
+
 eval(getPluginConf("_getdir"));
 
 function compareEntries( $a, $b )
@@ -26,19 +27,20 @@ if(isset($_REQUEST['mode']))
 	if(in_array("labels",$modes))
 	{
 		$req = new rXMLRPCRequest( new rXMLRPCCommand("d.multicall", array("",getCmd("d.get_custom1="))) );
-		$labels = array();
-		if($req->run() && !$req->fault)
-		{
-			for($i=0; $i<count($req->val); $i++)
-			{
-				$val = trim(rawurldecode($req->val[$i]));
-				if( $val!='' )
-					$labels[$val] = true;
-			}
-			$output["labels"] = array_keys($labels);
-			natcasesort($output["labels"]);
-			$output["labels"] = array_values($output["labels"]);
-		}
+        $labels = wsCustomization::getAllowedLabels();
+        /*$labels = array();
+        if($req->run() && !$req->fault)
+        {
+            for($i=0; $i<count($req->val); $i++)
+            {
+                $val = trim(rawurldecode($req->val[$i]));
+                if( $val!='' )
+                    $labels[$val] = true;
+            }
+            $output["labels"] = array_keys($labels);
+            natcasesort($output["labels"]);
+            $output["labels"] = array_values($output["labels"]);
+        }*/
 	}
 	if(in_array("dirlist",$modes))
 	{

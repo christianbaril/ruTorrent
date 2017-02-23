@@ -1,7 +1,6 @@
 <?php
 require_once( '../../php/util.php' );
 require_once( '../../php/settings.php' );
-require_once('../wscustom/wsCustomization.php');
 
 eval(getPluginConf("_getdir"));
 

@@ -6,7 +6,7 @@ set_time_limit(0);
 
 if(isset($_REQUEST['result']))
 {
-	if(isset($_REQUEST['json']))	
+	if(isset($_REQUEST['json']))
 		cachedEcho( '{ "result" : "'.$_REQUEST['result'][0].'" }',"application/json");
 	else
 	{
@@ -22,7 +22,7 @@ else
 {
 	$uploaded_files = array();
 	$label = null;
-	if(isset($_REQUEST['label']))	
+	if(isset($_REQUEST['label']))
 		$label = trim($_REQUEST['label']);
 	$dir_edit = null;
 	if(isset($_REQUEST['dir_edit']))
@@ -37,7 +37,7 @@ else
 		{
 			if( is_array($_FILES['torrent_file']['name']) )
 			{
-				for ($i = 0; $i<count($_FILES['torrent_file']['name']); ++$i) 
+				for ($i = 0; $i<count($_FILES['torrent_file']['name']); ++$i)
 				{
 														$files[] = array
 														(
@@ -91,7 +91,7 @@ else
 					}
 					else
 						$uploaded_url['status'] = "FailedURL";
-				}	
+				}
 				$uploaded_files[] = $uploaded_url;
 			}
 		}
@@ -123,7 +123,23 @@ else
 					unlink($file['file']);
 					$file['status'] = "Failed";
 				}
-			}
+
+                if ($torrent->hash_info()) {
+                    $PHP_AUTH_USER = null;
+                    if (isset($_SERVER['PHP_AUTH_USER']))
+                        $PHP_AUTH_USER = trim($_SERVER['PHP_AUTH_USER']);
+                    $req = new rXMLRPCRequest();
+
+                    // Add owner for the torrent that matches the hashes
+                    $cmd = new rXMLRPCCommand('d.set_custom', array(
+                            $torrent->hash_info(),
+                            'owner',
+                            $PHP_AUTH_USER
+                        ));
+                    $req->addCommand($cmd);
+                    $req->run();
+                }
+            }
 		}
 		$location.=('result[]='.$file['status'].'&');
 		if( isset($file['name']) )

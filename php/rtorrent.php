@@ -43,7 +43,8 @@ class rTorrent
 			}
 			if(!is_null($filename) && (rTorrentSettings::get()->iVersion>=0x805))
 				$cmd->addParameter(getCmd("d.set_custom")."=x-filename,".rawurlencode(getFileName($filename)));
-            $req = new rXMLRPCRequest();
+			$req = new rXMLRPCRequest();
+			$directory = self::parseDirectory($directory, $isAddPath);
 			if($directory && (strlen($directory)>0))
 			{
 				if(!rTorrentSettings::get()->correctDirectory($directory))
@@ -87,47 +88,6 @@ class rTorrent
 		return($hash);
 	}
 
-    static public function fastResume($torrent, $base, $add_path = true)
-    {
-        $files = array();
-        $info = $torrent->info;
-        $psize = intval($info['piece length']);
-        $base = trim($base);
-        if ($base == '') {
-            $req = new rXMLRPCRequest(new rXMLRPCCommand('get_directory'));
-            if ($req->success())
-                $base = $req->val[0];
-        }
-        if ($psize && rTorrentSettings::get()->correctDirectory($base)) {
-            $base = addslash($base);
-            $tsize = 0.0;
-            if (isset($info['files'])) {
-                foreach ($info['files'] as $key => $file) {
-                    $tsize += floatval($file['length']);
-                    $files[] = ($add_path ? $info['name'] . "/" . implode('/', $file['path']) : implode('/', $file['path']));
-                }
-            } else {
-                $tsize = floatval($info['length']);
-                $files[] = $info['name'];
-            }
-            $chunks = intval(($tsize + $psize - 1) / $psize);
-            $torrent->{'libtorrent_resume'}['bitfield'] = intval($chunks);
-            if (!isset($torrent->{'libtorrent_resume'}['files']))
-                $torrent->{'libtorrent_resume'}['files'] = array();
-            foreach ($files as $key => $file) {
-                $ss = LFS::stat($base . $file);
-                if ($ss === false)
-                    return (false);
-                if (count($torrent->{'libtorrent_resume'}['files']) < $key)
-                    $torrent->{'libtorrent_resume'}['files'][$key]['mtime'] = $ss["mtime"];
-                else
-                    $torrent->{'libtorrent_resume'}['files'][$key] = array("priority" => 2, "mtime" => $ss["mtime"]);
-            }
-            return ($torrent);
-        }
-        return (false);
-    }
-
 	static public function sendMagnet($magnet, $isStart, $isAddPath, $directory, $label, $addition = null)
 	{
 	        $hpos = stripos($magnet,'xt=urn:btih:');
@@ -145,6 +105,7 @@ class rTorrent
 				$req = new rXMLRPCRequest();
 				$cmd = new rXMLRPCCommand( $isStart ? 'load_start' : 'load' );
 				$cmd->addParameter($magnet);
+				$directory = self::parseDirectory($directory, $isAddPath);
 				if($directory && (strlen($directory)>0))
 				{
 					if(!rTorrentSettings::get()->correctDirectory($directory))
@@ -198,5 +159,60 @@ class rTorrent
 			}
 		}
 		return(false);
+	}
+
+	static public function fastResume($torrent, $base, $add_path = true)
+	{
+	        $files = array();
+	        $info = $torrent->info;
+	        $psize = intval($info['piece length']);
+		$base = trim($base);
+	        if($base=='')
+	        {
+	        	$base = rTorrentSettings::get()->directory;
+		}
+	        if($psize && rTorrentSettings::get()->correctDirectory($base))
+	        {
+		        $base = addslash($base);
+	                $tsize = 0.0;
+			if(isset($info['files']))
+			{
+				foreach($info['files'] as $key=>$file)
+				{
+				        $tsize+=floatval($file['length']);
+					$files[] = ($add_path ? $info['name']."/".implode('/',$file['path']) : implode('/',$file['path']));
+				}
+			}
+			else
+			{
+				$tsize = floatval($info['length']);
+				$files[] = $info['name'];
+			}
+			$chunks = intval(($tsize + $psize - 1) / $psize);
+			$torrent->{'libtorrent_resume'}['bitfield'] = intval($chunks);
+			if(!isset($torrent->{'libtorrent_resume'}['files']))
+				$torrent->{'libtorrent_resume'}['files'] = array();
+			foreach($files as $key=>$file)
+			{
+				$ss = LFS::stat($base.$file);
+				if($ss===false)
+					return(false);
+				if(count($torrent->{'libtorrent_resume'}['files'])<$key)
+					$torrent->{'libtorrent_resume'}['files'][$key]['mtime'] = $ss["mtime"];
+				else
+					$torrent->{'libtorrent_resume'}['files'][$key] = array( "priority" => 2, "mtime" => $ss["mtime"] );
+			}
+			return($torrent);
+		}
+		return(false);
+	}
+
+	static protected function parseDirectory($directory, $isAddPath)
+	{
+		if(!$isAddPath && (!$directory || (strlen($directory)==0)))
+		{
+			$directory = rTorrentSettings::get()->directory;
+		}
+		return($directory);
 	}
 }

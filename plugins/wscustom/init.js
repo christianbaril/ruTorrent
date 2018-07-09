@@ -1,8 +1,6 @@
 plugin.ownersLabels = {};
 
 plugin.start = rTorrentStub.prototype.start;
-setTimeout(function(){
-
 rTorrentStub.prototype.start = function () {
     noty('calling startcmd')
     plugin.start.call(this);
@@ -38,8 +36,6 @@ rTorrentStub.prototype.start = function () {
         }
     }
 }
-
-})
 
 plugin.preventautodelete = rTorrentStub.prototype.preventautodelete;
 rTorrentStub.prototype.preventautodelete = function () {

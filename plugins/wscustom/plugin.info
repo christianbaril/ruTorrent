@@ -1,3 +1,7 @@
 plugin.description: Set of customisation for admin and users of ruTorrent.
 plugin.author: MrB
 plugin.version: 0.1407
+plugin.runlevel: 13
+plugin.may_be_shutdowned: 0
+php.extensions.error: json
+plugin.help: https://google.com

@@ -1,12 +1,14 @@
 plugin.ownersLabels = {};
 
-plugin.prototype.start = rTorrentStub.prototype.start;
+plugin.start = rTorrentStub.prototype.start;
+setTimeout(function(){
+
 rTorrentStub.prototype.start = function () {
     noty('calling startcmd')
-    plugin.prototype.start.call(this);
+    plugin.start.call(this);
 
     for (var i = 0; i < this.hashes.length; i++) {
-//            var owner = theWebUI.getTable('trt').getValueById(this.hashes[i], 'owner');
+        //            var owner = theWebUI.getTable('trt').getValueById(this.hashes[i], 'owner');
         var owner = theWebUI.torrents[this.hashes[i]].owner;
 
         if (owner == '') {
@@ -35,7 +37,9 @@ rTorrentStub.prototype.start = function () {
 
         }
     }
-};
+}
+
+})
 
 plugin.preventautodelete = rTorrentStub.prototype.preventautodelete;
 rTorrentStub.prototype.preventautodelete = function () {
@@ -97,16 +101,16 @@ theWebUI.config = function (data) {
     plugin.config.call(this, data);
 
     plugin.reqOwner = theRequestManager.addRequest('trt', theRequestManager
-            .map('d.get_custom=')
+        .map('d.get_custom=')
         + 'owner', function (hash, torrent, value) {
-        torrent.owner = value;
-    });
+            torrent.owner = value;
+        });
 
     plugin.reqKeep = theRequestManager.addRequest('trt', theRequestManager
-            .map('d.get_custom=')
+        .map('d.get_custom=')
         + 'keep', function (hash, torrent, value) {
-        torrent.keep = value;
-    });
+            torrent.keep = value;
+        });
 
 };
 
@@ -172,7 +176,7 @@ theWebUI.rebuildOwnersLabels = function () {
         }
 
         for (hash in this.torrents) {
-//            var size = (parseInt(this.torrents[hash].size));
+            //            var size = (parseInt(this.torrents[hash].size));
             var size = (parseInt(this.torrents[hash].downloaded));
             ownersLabels[this.torrents[hash].owner] += 1;
             ownersLabelsSize[this.torrents[hash].owner] += size;

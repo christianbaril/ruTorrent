@@ -153,6 +153,7 @@ class wsCustomization
     {
         return array(
             'wickedsun',
+            'wicked',
             'mrb'
         );
     }

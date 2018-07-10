@@ -10,236 +10,230 @@ eval(getPluginConf('wsCustomization'));
  */
 class wsCustomization
 {
-    public $hash = "wsCustomization.dat";
-    private $path;
-    private $username;
+  public $hash = "wsCustomization.dat";
+  private $path;
+  private $username;
 
-    function __construct()
-    {
-        $this->setPath();
-        $this->setUsername($_SERVER['PHP_AUTH_USER']);
-    }
+  function __construct()
+  {
+    $this->setPath();
+    $this->setUsername($_SERVER['PHP_AUTH_USER']);
+  }
 
-    /***
-     * init
-     */
-    public static function init()
-    {
-        global $jEnd, $jResult;
+  /***
+   * init
+   */
+  public static function init()
+  {
+    global $jEnd, $jResult;
 
-        $wsc = new wsCustomization();
-
-        /**
-         * Common stuff
-         */
-        // labels
-        $jResult .= "allowedLabels = " . json_encode($wsc->getAllowedLabels()) . ";";
-        // disabled columns
-        $jResult .= "disabledColumns = " . json_encode($wsc->getDisabledColumns()) . ";";
-        $jResult .= "hiddenLabels = " . json_encode($wsc->getHiddenLabels()) . ";";
-
-        // infos for current user
-        $userinfos = Array(
-            "username" => $wsc->getUsername(),
-            "admin"    => $wsc->isAdmin(),
-        );
-        $jResult .= "userinfo = " . json_encode($userinfos) . ";";
-
-        // Overriding context menu routine
-        $jEnd .= $wsc->getContextMenu();
-
-        // Disabling manually add torrent
-        $wsc->disableAddTorrent();
-
-        // Disabling start a download without a label set
-        $jEnd .= $wsc->disallowStartsWithoutLabel();
-
-        // Overriding start torrent
-        $jEnd .= $wsc->getStartCmd();
-
-
-        // Restricting access to users
-        if (!$wsc->isAdmin()) {
-            // Removing unwanted menu items
-            $jEnd .= $wsc->addJsDelay($wsc->removeMenus(), 200);
-            $jEnd .= $wsc->removeSettings();
-            $jEnd .= $wsc->addJsDelay($wsc->disableColumns(), 300);
-        }
-
-    }
+    $wsc = new wsCustomization();
 
     /**
-     * getAllowedLabels
-     * @return array
+     * Common stuff
      */
-    public static function getAllowedLabels()
-    {
-        return array(
-            'Anime',
-            'French',
-            'Learning',
-            'Mac',
-            'Misc',
-            'Movies',
-            'Music',
-            'NintendoDS',
-            'Porn',
-            'PS3',
-            'PSP',
-            'TVShows',
-            'Wii',
-            'Windows',
-            'XBox360'
-        );
+    // labels
+    $jResult .= "allowedLabels = " . json_encode($wsc->getAllowedLabels()) . ";";
+    // disabled columns
+    $jResult .= "disabledColumns = " . json_encode($wsc->getDisabledColumns()) . ";";
+    $jResult .= "hiddenLabels = " . json_encode($wsc->getHiddenLabels()) . ";";
+
+    // infos for current user
+    $userinfos = Array(
+      "username" => $wsc->getUsername(),
+      "admin"    => $wsc->isAdmin(),
+    );
+    $jResult .= "userinfo = " . json_encode($userinfos) . ";";
+
+    // Overriding context menu routine
+    $jEnd .= $wsc->getContextMenu();
+
+    // Disabling manually add torrent
+    $wsc->disableAddTorrent();
+
+    // Disabling start a download without a label set
+    $jEnd .= $wsc->disallowStartsWithoutLabel();
+
+    // Overriding start torrent
+    $jEnd .= $wsc->getStartCmd();
+
+    // Restricting access to users
+    if (!$wsc->isAdmin()) {
+      // Removing unwanted menu items
+      $jEnd .= $wsc->removeMenus();
+      $jEnd .= $wsc->removeSettings();
+      $jEnd .= $wsc->disableColumns();
     }
 
-    /**
-     * getDisabledColumns
-     * @return array
-     */
-    public static function getDisabledColumns()
-    {
-        return array(
-            'ratioday',
-            'ratioweek',
-            'ratiomonth',
-            'priority',
-            'owner',
-            'keep',
-            'ratiogroup',
-            'throttle',
-            'channel'
-        );
-    }
+  }
 
-    /**
-     * getHiddenLabels
-     * @return array
-     */
-    public static function getHiddenLabels()
-    {
-        return array(
-            'TVshows_Auto',
-            'Movies_Auto'
-        );
-    }
+  /**
+   * getAllowedLabels
+   * @return array
+   */
+  public static function getAllowedLabels()
+  {
+    $directory = '/mnt/FTP/home/rtorrent/finished/';
+    $words = array('autodl', '.','temp');
+    $dirnames = array_map(function ($dir) use ($directory) {
+      return str_replace($directory, '', $dir);
+    }, array_filter(glob($directory . '*'), 'is_dir'));
+    return array_filter($dirnames, function ($dir) use ($words) {
+      $matches = 0;
+      foreach ($words as $word) {
+        $matches += (strpos(strtolower($dir), strtolower($word)) !== false) ? 1 : 0;
+      }
+      return (!$matches);
+    });
+  }
 
-    /**
-     * @return mixed
-     */
-    public function getUsername()
-    {
-        return $this->username;
-    }
+  /**
+   * getDisabledColumns
+   * @return array
+   */
+  public static function getDisabledColumns()
+  {
+    return array(
+      'ratioday',
+      'ratioweek',
+      'ratiomonth',
+      'priority',
+      'owner',
+      'keep',
+      'ratiogroup',
+      'throttle',
+      'channel'
+    );
+  }
 
-    /**
-     * @param mixed $username
-     */
-    public function setUsername($username)
-    {
-        $this->username = $username;
-    }
+  /**
+   * getHiddenLabels
+   * @return array
+   */
+  public static function getHiddenLabels()
+  {
+    return array(
+      'TVshows_Auto',
+      'Movies_Auto'
+    );
+  }
 
-    /**
-     * isAdmin
-     * @return bool
-     */
-    public function isAdmin()
-    {
-        return in_array($_SERVER['PHP_AUTH_USER'], $this->getAdmins());
-    }
+  /**
+   * @return mixed
+   */
+  public function getUsername()
+  {
+    return $this->username;
+  }
 
-    private function getAdmins()
-    {
-        return array(
-            'wickedsun',
-            'wicked',
-            'mrb'
-        );
-    }
+  /**
+   * @param mixed $username
+   */
+  public function setUsername($username)
+  {
+    $this->username = $username;
+  }
 
-    /**
-     * getContextMenu
-     * @return string
-     */
-    public function getContextMenu()
-    {
-        return file_get_contents($this->getPath() . '/js/getContextMenu.js');
-    }
+  /**
+   * isAdmin
+   * @return bool
+   */
+  public function isAdmin()
+  {
+    return in_array($_SERVER['PHP_AUTH_USER'], $this->getAdmins());
+  }
 
-    /**
-     * getPath
-     * @return mixed
-     */
-    public function getPath()
-    {
-        return $this->path;
-    }
+  private function getAdmins()
+  {
+    return array(
+      'wickedsun',
+      'wicked',
+      'mrb'
+    );
+  }
 
-    /**
-     * setPath
-     */
-    public function setPath()
-    {
-        $this->path = dirname(__FILE__);
-    }
+  /**
+   * getContextMenu
+   * @return string
+   */
+  public function getContextMenu()
+  {
+    return file_get_contents($this->getPath() . '/js/getContextMenu.js');
+  }
 
-    /**
-     * @return string
-     */
-    public function disableAddTorrent()
-    {
-        return file_get_contents($this->getPath() . '/js/disableAddTorrent.js');
-    }
+  /**
+   * getPath
+   * @return mixed
+   */
+  public function getPath()
+  {
+    return $this->path;
+  }
 
-    /**
-     * disallowStartsWithoutLabel
-     * @return string
-     */
-    public function disallowStartsWithoutLabel()
-    {
-        return file_get_contents($this->getPath() . '/js/disallowStartsWithoutLabel.js');
-    }
+  /**
+   * setPath
+   */
+  public function setPath()
+  {
+    $this->path = dirname(__FILE__);
+  }
 
-    /**
-     * getStartCmd
-     * @return string
-     */
-    public function getStartCmd()
-    {
-        return file_get_contents($this->getPath() . '/js/getStartCmd.js');
-    }
+  /**
+   * @return string
+   */
+  public function disableAddTorrent()
+  {
+    return file_get_contents($this->getPath() . '/js/disableAddTorrent.js');
+  }
 
-    public function addJsDelay($javascript, $milliseconds)
-    {
-        return "setTimeout(function() {  $javascript  }, $milliseconds);";;
-    }
+  /**
+   * disallowStartsWithoutLabel
+   * @return string
+   */
+  public function disallowStartsWithoutLabel()
+  {
+    return file_get_contents($this->getPath() . '/js/disallowStartsWithoutLabel.js');
+  }
 
-    /**
-     * removeMenus
-     * @return mixed
-     */
-    public function removeMenus()
-    {
-        return file_get_contents($this->getPath() . '/js/removeMenus.js');
-    }
+  /**
+   * getStartCmd
+   * @return string
+   */
+  public function getStartCmd()
+  {
+    return file_get_contents($this->getPath() . '/js/getStartCmd.js');
+  }
 
-    /**
-     * removeSettings
-     * @return mixed
-     */
-    public function removeSettings()
-    {
-        return file_get_contents($this->getPath() . '/js/removeSettings.js');
-    }
+  public function addJsDelay($javascript, $milliseconds)
+  {
+    return "setTimeout(function() {  $javascript  }, $milliseconds);";;
+  }
 
-    /**
-     * disableColumns
-     * @return string
-     */
-    public function disableColumns()
-    {
-        return file_get_contents($this->getPath() . '/js/disableColumns.js');
-    }
+  /**
+   * removeMenus
+   * @return mixed
+   */
+  public function removeMenus()
+  {
+    return file_get_contents($this->getPath() . '/js/removeMenus.js');
+  }
+
+  /**
+   * removeSettings
+   * @return mixed
+   */
+  public function removeSettings()
+  {
+    return file_get_contents($this->getPath() . '/js/removeSettings.js');
+  }
+
+  /**
+   * disableColumns
+   * @return string
+   */
+  public function disableColumns()
+  {
+    return file_get_contents($this->getPath() . '/js/disableColumns.js');
+  }
 
 }

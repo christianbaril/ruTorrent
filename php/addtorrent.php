@@ -97,15 +97,15 @@ else
     }
   }
   $location = "Location: addtorrent.php?";
+  
+  if (isset($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_USER'])){
+    $owner = $_SERVER['PHP_AUTH_USER'];
+  } else if (isset($_POST['owner'])){
+    $owner = $_POST['owner'];
+  }
 
-	$owner = false;
-	if (isset($_SERVER['PHP_AUTH_USER']))
-			$owner = $_SERVER['PHP_AUTH_USER'];
-	else (isset($_POST['owner'])){
-			$owner = $_POST['owner'];
-	}
   // Reject torrent if user no owner 
-	if(empty($uploaded_files) || !$owner)
+	if(empty($uploaded_files) || !isset($owner))
     $uploaded_files = array( array( 'status' => "Failed" ) );
   foreach($uploaded_files as &$file)
   {
@@ -131,20 +131,18 @@ else
           unlink($file['file']);
           $file['status'] = "Failed";
         }
+				
+        $req = new rXMLRPCRequest();
 
-        if ($torrent->info['unique']) {
-					
-					$req = new rXMLRPCRequest();
+        // Add owner for the torrent that matches the hashes
+        $cmd = new rXMLRPCCommand('d.set_custom', array(
+          $torrent->info['unique'],
+          'owner',
+          $owner
+        ));
 
-          // Add owner for the torrent that matches the hashes
-          $cmd = new rXMLRPCCommand('d.set_custom', array(
-            $torrent->info['unique'],
-            'owner',
-            $owner
-          ));
-          $req->addCommand($cmd);
-          $req->run();
-        }
+        $req->addCommand($cmd);
+        $req->run();
       }
     }
     $location.=('result[]='.$file['status'].'&');
